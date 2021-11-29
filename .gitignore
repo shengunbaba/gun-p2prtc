@@ -1,0 +1,15 @@
+.cache
+node_modules
+static
+.idea
+out
+static.zip
+yarn-error.log
+dist
+dist.zip
+package-lock.json
+deploy.sh
+dev.yml
+yarn.lock
+.DS_Store
+app.js
