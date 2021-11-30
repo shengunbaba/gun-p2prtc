@@ -2,7 +2,7 @@
   "name": "peer2peerrtc",
   "version": "1.0.0",
   "description": "",
-  "main": "index.js",
+  "main": "src/peer2peer.js",
   "scripts": {},
   "author": "",
   "license": "ISC",

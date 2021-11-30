@@ -1,3 +1,0 @@
-class Peer2PeerRTC {
-    
-}
