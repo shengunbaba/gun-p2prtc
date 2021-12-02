@@ -12,4 +12,3 @@ deploy.sh
 dev.yml
 yarn.lock
 .DS_Store
-app.js

@@ -3,10 +3,15 @@
   "version": "1.0.0",
   "description": "",
   "main": "src/peer2peer.js",
-  "scripts": {},
+  "scripts": {
+    "watch": "node script/watch.compile.js dev",
+    "start": "node script/app.js",
+    "build": ""
+  },
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "gun-pack": "^1.0.11",
     "ws": "^8.3.0"
   }
 }

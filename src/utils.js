@@ -1,4 +1,4 @@
-export  class EventDispatcher {
+export class EventDispatcher {
     constructor() {
         this.eventListeners = {}
     }
@@ -35,3 +35,6 @@ export  class EventDispatcher {
         }
     }
 }
+
+
+export const createShortId = () => (Math.floor((Math.random() + 1) * 0x10000)).toString(16);
