@@ -1,7 +1,6 @@
 const webpack = require('webpack');
 const devCon = require('./webpack.config');
 const compiler = webpack(devCon);
-const con = require('./dev/config')
 
 compiler.watch({
     aggregateTimeout: 300,
@@ -17,5 +16,5 @@ compiler.watch({
         });
     }
 
-    console.log(con.compile_complete);
+    console.log('compile complete');
 });
