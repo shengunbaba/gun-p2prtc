@@ -3,9 +3,80 @@
 <head>
     <meta charset="UTF-8">
     <title>Peer2Peer</title>
+    <link rel="stylesheet" href="./style.css">
     <script src="./p2pRTC.js"></script>
 </head>
 <body>
+<ul class="connect-wrap">
+    <li>
+        <label for="localInput">local:</label>
+        <input type="text" id="localInput">
+    </li>
+    <li>
+        <label for="remoteInput">remote:</label>
+        <input type="text" id="remoteInput">
+    </li>
+    <li class="connect" onclick="onConnect()">connect</li>
+</ul>
+<div class="video-wrap">
+    <video id="localVideo" autoplay></video>
+    <video id="remoteVideo" autoplay></video>
+</div>
 
+<script>
+    const localInput = document.getElementById('localInput');
+    const remoteInput = document.getElementById('remoteInput');
+    const localVideo = document.getElementById('localVideo');
+    const remoteVideo = document.getElementById('remoteVideo');
+    const connectWrap = document.querySelector('.connect-wrap')
+    let peer, ws;
+    localInput.value = (Math.random() * 1000 * 0x10000).toString(16).slice(0, 4);
+
+    function createWs() {
+        ws = new WebSocket('ws://localhost:8080');
+        ws.addEventListener('message', (event) => {
+
+            const data = JSON.parse(event.data)
+            console.log(data)
+
+            switch (data.type) {
+                case 'ready':
+                    connectWrap.style.display = 'none';
+                    if (peer) return;
+                    createPeer();
+                    break;
+                case 'offer':
+                    peer.signal(data)
+                    break;
+                case 'answer':
+                    peer.signal(data)
+                    break;
+            }
+        });
+    }
+
+    function createPeer() {
+        const option = {}
+        if (remoteInput.value) {
+            option.initiator = true
+        }
+        peer = new Peer2peer(option);
+
+        peer.addEventListener('localStream', data => {
+            localVideo.srcObject = data.stream;
+        })
+
+        peer.addEventListener('offer', offer => {
+            ws.send(JSON.stringify(offer))
+        })
+        peer.addEventListener('answer', answer => {
+            ws.send(JSON.stringify(answer))
+        })
+    }
+
+    const onConnect = () => {
+        createWs()
+    }
+</script>
 </body>
 </html>

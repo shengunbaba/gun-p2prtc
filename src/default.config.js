@@ -1,6 +1,11 @@
 export default {
     rtcConfiguration: null,
     initiator: false,
-    offerOptions: {},
-    constraints: {audio: true, video: true}
+    offerOptions: {
+        offerToReceiveAudio: 1,
+        offerToReceiveVideo: 1
+    },
+    answerOptions: {},
+    constraints: {audio: true, video: true},
+    localStream: null
 }

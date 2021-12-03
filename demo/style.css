@@ -1,0 +1,33 @@
+li {
+    list-style: none;
+}
+
+ul, li, p {
+    padding: 0;
+    margin: 0;
+}
+
+.connect-wrap {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+li {
+    margin: 30px;
+}
+
+.connect {
+    padding: 5px 18px;
+    background: #64d979;
+    color: #fff;
+    margin: 30px;
+    border-radius: 8px;
+    cursor: pointer;
+}
+
+.video-wrap {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
