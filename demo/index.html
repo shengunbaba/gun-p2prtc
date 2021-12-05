@@ -24,35 +24,35 @@
 </div>
 
 <script>
-    const localInput = document.getElementById('localInput');
-    const remoteInput = document.getElementById('remoteInput');
-    const localVideo = document.getElementById('localVideo');
-    const remoteVideo = document.getElementById('remoteVideo');
+    const localInput = document.getElementById('localInput')
+    const remoteInput = document.getElementById('remoteInput')
+    const localVideo = document.getElementById('localVideo')
+    const remoteVideo = document.getElementById('remoteVideo')
     const connectWrap = document.querySelector('.connect-wrap')
-    let peer, ws;
-    localInput.value = (Math.random() * 1000 * 0x10000).toString(16).slice(0, 4);
+    let peer, ws
+    localInput.value = (Math.random() * 1000 * 0x10000).toString(16).slice(0, 4)
 
     function createWs() {
-        ws = new WebSocket('ws://localhost:8080');
+        ws = new WebSocket('ws://localhost:8080')
         ws.addEventListener('message', (event) => {
-
             const data = JSON.parse(event.data)
-            console.log(data)
-
             switch (data.type) {
                 case 'ready':
-                    connectWrap.style.display = 'none';
-                    if (peer) return;
-                    createPeer();
-                    break;
+                    connectWrap.style.display = 'none'
+                    if (peer) return
+                    createPeer()
+                    break
                 case 'offer':
                     peer.signal(data)
-                    break;
+                    break
                 case 'answer':
                     peer.signal(data)
-                    break;
+                    break
+                case 'icecandidate':
+                    peer.signal(data)
+                    break
             }
-        });
+        })
     }
 
     function createPeer() {
@@ -60,10 +60,10 @@
         if (remoteInput.value) {
             option.initiator = true
         }
-        peer = new Peer2peer(option);
+        peer = new Peer2peer(option)
 
         peer.addEventListener('localStream', data => {
-            localVideo.srcObject = data.stream;
+            localVideo.srcObject = data.stream
         })
 
         peer.addEventListener('offer', offer => {
@@ -71,6 +71,12 @@
         })
         peer.addEventListener('answer', answer => {
             ws.send(JSON.stringify(answer))
+        })
+        peer.addEventListener('icecandidate', event => {
+            if (event.candidate) ws.send(JSON.stringify({ type: 'icecandidate', candidate: event.candidate }))
+        })
+        peer.addEventListener('remoteStream', event => {
+            remoteVideo.srcObject = event.remoteStream;
         })
     }
 
