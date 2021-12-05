@@ -6,7 +6,7 @@
   "scripts": {
     "watch": "node script/watch.compile.js dev",
     "start": "node script/app.js",
-    "build": ""
+    "build": "node_modules/.bin/webpack --config script/webpack.config.js"
   },
   "author": "",
   "license": "ISC",
