@@ -33,7 +33,7 @@
     localInput.value = (Math.random() * 1000 * 0x10000).toString(16).slice(0, 4)
 
     function createWs() {
-        ws = new WebSocket('ws://localhost:8080')
+        ws = new WebSocket('wss://192.168.0.104:8080')
         ws.addEventListener('message', (event) => {
             const data = JSON.parse(event.data)
             switch (data.type) {
@@ -76,7 +76,7 @@
             if (event.candidate) ws.send(JSON.stringify({ type: 'icecandidate', candidate: event.candidate }))
         })
         peer.addEventListener('remoteStream', event => {
-            remoteVideo.srcObject = event.remoteStream;
+            remoteVideo.srcObject = event.remoteStream
         })
     }
 

@@ -1,4 +1,5 @@
 # peer to peer ， based on webrtc
+`Be sure to use HTTPS protocol or localhost, otherwise the demo will not work properly`
 
 Simple WebRTC video, voice, and data channels
 

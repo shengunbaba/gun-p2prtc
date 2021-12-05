@@ -1,6 +1,14 @@
 const WebSocket = require('ws');
+const {createServer} = require('https');
+const fs = require('fs');
+const path = require('path');
 
-const wss = new WebSocket.WebSocketServer({port: 8080});
+const server = createServer({
+    key: fs.readFileSync(path.join(__dirname, './secret/server.key')),
+    cert: fs.readFileSync(path.join(__dirname, './secret/server.crt')),
+});
+
+const wss = new WebSocket.WebSocketServer({ server });
 
 wss.on('connection', (ws) => {
 
@@ -28,3 +36,5 @@ wss.on('connection', (ws) => {
     }
 
 });
+
+server.listen(8080);
