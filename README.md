@@ -89,7 +89,7 @@ A "signaling server" (usually implemented with websockets) would be used to exch
            const promise = audioStatus ? peer.mute('audio') : peer.unmute('audio');
            promise.then(() => {
                audioStatus = !audioStatus;
-               document.querySelector('.switch-audio').innerHTML = audioStatus ? '关闭音频' : '开启音频'
+               document.querySelector('.switch-audio').innerHTML = audioStatus ? 'close audio' : 'open audio'
            })
        }
    
@@ -97,7 +97,7 @@ A "signaling server" (usually implemented with websockets) would be used to exch
            const promise = videoStatus ? peer.mute('video') : peer.unmute('video');
            promise.then(() => {
                videoStatus = !videoStatus;
-               document.querySelector('.switch-video').innerHTML = videoStatus ? '关闭视频' : '开启视频'
+               document.querySelector('.switch-video').innerHTML = videoStatus ? 'close video' : 'open video'
            })
        }
    

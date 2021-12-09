@@ -19,9 +19,9 @@
     <li class="connect" onclick="onConnect()">connect</li>
 </ul>
 <div class="video-panel">
-    <span onclick="onSwitchAudio()" class="switch-audio">关闭音频</span>
-    <span onclick="onSwitchVideo()" class="switch-video">关闭视频</span>
-    <span onclick="onleave()">挂断</span>
+    <span onclick="onSwitchAudio()" class="switch-audio">close audio</span>
+    <span onclick="onSwitchVideo()" class="switch-video">close video</span>
+    <span onclick="onleave()">leave</span>
 </div>
 <div class="video-wrap">
     <video id="localVideo" autoplay muted></video>
@@ -92,7 +92,7 @@
         const promise = audioStatus ? peer.mute('audio') : peer.unmute('audio');
         promise.then(() => {
             audioStatus = !audioStatus;
-            document.querySelector('.switch-audio').innerHTML = audioStatus ? '关闭音频' : '开启音频'
+            document.querySelector('.switch-audio').innerHTML = audioStatus ? 'close audio' : 'open audio'
         })
     }
 
@@ -100,7 +100,7 @@
         const promise = videoStatus ? peer.mute('video') : peer.unmute('video');
         promise.then(() => {
             videoStatus = !videoStatus;
-            document.querySelector('.switch-video').innerHTML = videoStatus ? '关闭视频' : '开启视频'
+            document.querySelector('.switch-video').innerHTML = videoStatus ? 'close video' : 'open video'
         })
     }
 
