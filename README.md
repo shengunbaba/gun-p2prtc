@@ -1,13 +1,22 @@
 # peer to peer ， based on webrtc
 `Be sure to use HTTPS protocol or localhost, otherwise the demo will not work properly`
 
-Simple WebRTC video, voice, and data channels
+[github](https://github.com/shengunbaba/peer2peerRTC)
+
+Simple WebRTC video, voice, and data channels;
+
+The peer2peerRTC is separated from websocket; you can customize your signaling service.
 
 ## features
 - supports video/voice streams
 - supports data channel
 
 ## usage
+you can install with npm ,or use script tags to import
+```jsx 
+npm install peer2peertc
+```
+
 This example create two peers in separated web page.  
 
 In a real-world application,  The sender and receiver Peer instances would exist in separate browsers. 
@@ -30,57 +39,72 @@ A "signaling server" (usually implemented with websockets) would be used to exch
 
 <script>
     let peer, ws
-    function createWs() {
-        ws = new WebSocket('ws://localhost:8080')
-        ws.addEventListener('message', (event) => {
-            const data = JSON.parse(event.data)
-            switch (data.type) {
-                case 'ready':
-                    connectWrap.style.display = 'none'
-                    if (peer) return
-                    createPeer()
-                    break
-                case 'offer':
-                    peer.signal(data)
-                    break
-                case 'answer':
-                    peer.signal(data)
-                    break
-                case 'icecandidate':
-                    peer.signal(data)
-                    break
-            }
-        })
-    }
-
-    function createPeer() {
-        const option = {}
-        if (remoteInput.value) {
-            option.initiator = true
-        }
-        peer = new Peer2peer(option)
-
-        peer.addEventListener('localStream', data => {
-            localVideo.srcObject = data.stream
-        })
-
-        peer.addEventListener('offer', offer => {
-            ws.send(JSON.stringify(offer))
-        })
-        peer.addEventListener('answer', answer => {
-            ws.send(JSON.stringify(answer))
-        })
-        peer.addEventListener('icecandidate', event => {
-            if (event.candidate) ws.send(JSON.stringify({ type: 'icecandidate', candidate: event.candidate }))
-        })
-        peer.addEventListener('remoteStream', event => {
-            remoteVideo.srcObject = event.remoteStream;
-        })
-    }
-
-    const onConnect = () => {
-        createWs()
-    }
+   const onConnect = () => {
+   
+           const option = {}
+           if (remoteInput.value) {
+               option.initiator = true
+           }
+           peer = new Peer2peer(option);
+           peer.addEventListener('localStream', data => {
+               localVideo.srcObject = data.stream
+           })
+   
+           peer.addEventListener('offer', offer => {
+               ws.send(JSON.stringify(offer))
+           })
+           peer.addEventListener('answer', answer => {
+               ws.send(JSON.stringify(answer))
+           })
+           peer.addEventListener('icecandidate', event => {
+               if (event.candidate) ws.send(JSON.stringify({type: 'icecandidate', candidate: event.candidate}))
+           })
+           peer.addEventListener('remoteStream', event => {
+               remoteVideo.srcObject = event.stream
+           })
+   
+           ws = new WebSocket('wss://localhost:8080')
+           ws.addEventListener('message', (event) => {
+               const data = JSON.parse(event.data)
+               switch (data.type) {
+                   case 'ready':
+                       connectPanel.style.display = 'none'
+                       videoPanel.style.display = 'flex';
+                       peer.signal('ready');
+                       break
+                   case 'offer':
+                       peer.signal(data)
+                       break
+                   case 'answer':
+                       peer.signal(data)
+                       break
+                   case 'icecandidate':
+                       peer.signal(data)
+                       break
+               }
+           })
+       }
+   
+       const onSwitchAudio = () => {
+           const promise = audioStatus ? peer.mute('audio') : peer.unmute('audio');
+           promise.then(() => {
+               audioStatus = !audioStatus;
+               document.querySelector('.switch-audio').innerHTML = audioStatus ? '关闭音频' : '开启音频'
+           })
+       }
+   
+       const onSwitchVideo = () => {
+           const promise = videoStatus ? peer.mute('video') : peer.unmute('video');
+           promise.then(() => {
+               videoStatus = !videoStatus;
+               document.querySelector('.switch-video').innerHTML = videoStatus ? '关闭视频' : '开启视频'
+           })
+       }
+   
+       const onleave = () => {
+           peer.leave()
+           location.reload()
+       };
 </script>
 </body>
 </html>
@@ -115,6 +139,17 @@ The options do the following:
 - `constraints`: custom stream options (used by getUserMedia method)
 - `localStream`: if video/voice is desired, pass stream returned from getUserMedia
 
+### `peer.signal(data)`
+Call this method whenever the remote peer SDP message received.
+
+### `peer.mute(kind)`
+string <video | audio>.  close local audio or close local video
+
+### `peer.unmute(data)`
+string <video | audio>.  open local audio or open local video, and remote peer will received.
+
+### `peer.leave()`
+peer leave.
 
 ## events
 

@@ -7,7 +7,7 @@
     <script src="./p2pRTC.js"></script>
 </head>
 <body>
-<ul class="connect-wrap">
+<ul class="connect-panel">
     <li>
         <label for="localInput">local:</label>
         <input type="text" id="localInput">
@@ -18,8 +18,13 @@
     </li>
     <li class="connect" onclick="onConnect()">connect</li>
 </ul>
+<div class="video-panel">
+    <span onclick="onSwitchAudio()" class="switch-audio">关闭音频</span>
+    <span onclick="onSwitchVideo()" class="switch-video">关闭视频</span>
+    <span onclick="onleave()">挂断</span>
+</div>
 <div class="video-wrap">
-    <video id="localVideo" autoplay></video>
+    <video id="localVideo" autoplay muted></video>
     <video id="remoteVideo" autoplay></video>
 </div>
 
@@ -28,19 +33,47 @@
     const remoteInput = document.getElementById('remoteInput')
     const localVideo = document.getElementById('localVideo')
     const remoteVideo = document.getElementById('remoteVideo')
-    const connectWrap = document.querySelector('.connect-wrap')
-    let peer, ws
+    const connectPanel = document.querySelector('.connect-panel')
+    const videoPanel = document.querySelector('.video-panel')
+    let peer,
+        ws,
+        audioStatus = true,
+        videoStatus = true;
     localInput.value = (Math.random() * 1000 * 0x10000).toString(16).slice(0, 4)
 
-    function createWs() {
+
+    const onConnect = () => {
+
+        const option = {}
+        if (remoteInput.value) {
+            option.initiator = true
+        }
+        peer = new Peer2peer(option);
+        peer.addEventListener('localStream', data => {
+            localVideo.srcObject = data.stream
+        })
+
+        peer.addEventListener('offer', offer => {
+            ws.send(JSON.stringify(offer))
+        })
+        peer.addEventListener('answer', answer => {
+            ws.send(JSON.stringify(answer))
+        })
+        peer.addEventListener('icecandidate', event => {
+            if (event.candidate) ws.send(JSON.stringify({type: 'icecandidate', candidate: event.candidate}))
+        })
+        peer.addEventListener('remoteStream', event => {
+            remoteVideo.srcObject = event.stream
+        })
+
         ws = new WebSocket('wss://localhost:8080')
         ws.addEventListener('message', (event) => {
             const data = JSON.parse(event.data)
             switch (data.type) {
                 case 'ready':
-                    connectWrap.style.display = 'none'
-                    if (peer) return
-                    createPeer()
+                    connectPanel.style.display = 'none'
+                    videoPanel.style.display = 'flex';
+                    peer.signal('ready');
                     break
                 case 'offer':
                     peer.signal(data)
@@ -55,34 +88,26 @@
         })
     }
 
-    function createPeer() {
-        const option = {}
-        if (remoteInput.value) {
-            option.initiator = true
-        }
-        peer = new Peer2peer(option)
-
-        peer.addEventListener('localStream', data => {
-            localVideo.srcObject = data.stream
-        })
-
-        peer.addEventListener('offer', offer => {
-            ws.send(JSON.stringify(offer))
-        })
-        peer.addEventListener('answer', answer => {
-            ws.send(JSON.stringify(answer))
-        })
-        peer.addEventListener('icecandidate', event => {
-            if (event.candidate) ws.send(JSON.stringify({ type: 'icecandidate', candidate: event.candidate }))
-        })
-        peer.addEventListener('remoteStream', event => {
-            remoteVideo.srcObject = event.remoteStream
+    const onSwitchAudio = () => {
+        const promise = audioStatus ? peer.mute('audio') : peer.unmute('audio');
+        promise.then(() => {
+            audioStatus = !audioStatus;
+            document.querySelector('.switch-audio').innerHTML = audioStatus ? '关闭音频' : '开启音频'
         })
     }
 
-    const onConnect = () => {
-        createWs()
+    const onSwitchVideo = () => {
+        const promise = videoStatus ? peer.mute('video') : peer.unmute('video');
+        promise.then(() => {
+            videoStatus = !videoStatus;
+            document.querySelector('.switch-video').innerHTML = videoStatus ? '关闭视频' : '开启视频'
+        })
     }
+
+    const onleave = () => {
+        peer.leave()
+        location.reload()
+    };
 </script>
 </body>
 </html>

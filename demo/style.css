@@ -7,7 +7,7 @@ ul, li, p {
     margin: 0;
 }
 
-.connect-wrap {
+.connect-panel {
     display: flex;
     align-items: center;
     justify-content: center;
@@ -30,4 +30,20 @@ li {
     display: flex;
     align-items: center;
     justify-content: center;
+    flex-direction: column;
+}
+
+.video-panel {
+    display: none;
+    align-items: center;
+    justify-content: center;
+}
+
+.video-panel span {
+    padding: 4px 18px;
+    border-radius: 6px;
+    border: 1px solid #64d979;
+    margin: 30px 10px;
+    cursor: pointer;
+    color: #64d979;
 }

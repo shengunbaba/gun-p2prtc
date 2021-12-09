@@ -1,0 +1,8 @@
+.git
+.idea
+node_modules
+app.js
+src
+yarn.lock
+script
+demo

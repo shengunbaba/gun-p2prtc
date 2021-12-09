@@ -1,7 +1,7 @@
 {
-  "name": "peer2peerrtc",
+  "name": "peer2peertc",
   "version": "1.0.0",
-  "description": "",
+  "description": "peer to peer video and audio",
   "main": "src/peer2peer.js",
   "scripts": {
     "watch": "node script/watch.compile.js dev",
@@ -10,9 +10,14 @@
   },
   "author": "",
   "license": "ISC",
-  "dependencies": {
+  "keywords": [
+    "webrtc",
+    "peer2peer",
+    "video",
+    "audio"
+  ],
+  "devDependencies": {
     "gun-pack": "^1.0.11",
-    "pem": "^1.14.4",
     "ws": "^8.3.0"
   }
 }
