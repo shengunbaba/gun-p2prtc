@@ -145,7 +145,7 @@ Call this method whenever the remote peer SDP message received.
 ### `peer.mute(kind)`
 string <video | audio>.  close local audio or close local video
 
-### `peer.unmute(data)`
+### `peer.unmute(kind)`
 string <video | audio>.  open local audio or open local video, and remote peer will received.
 
 ### `peer.getStats()`
