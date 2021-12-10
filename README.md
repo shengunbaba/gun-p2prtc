@@ -148,6 +148,9 @@ string <video | audio>.  close local audio or close local video
 ### `peer.unmute(data)`
 string <video | audio>.  open local audio or open local video, and remote peer will received.
 
+### `peer.getStats()`
+provide statistics about either the overall connection 
+
 ### `peer.leave()`
 peer leave.
 

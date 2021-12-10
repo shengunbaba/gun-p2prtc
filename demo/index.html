@@ -29,84 +29,85 @@
 </div>
 
 <script>
-    const localInput = document.getElementById('localInput')
-    const remoteInput = document.getElementById('remoteInput')
-    const localVideo = document.getElementById('localVideo')
-    const remoteVideo = document.getElementById('remoteVideo')
-    const connectPanel = document.querySelector('.connect-panel')
-    const videoPanel = document.querySelector('.video-panel')
+    const localInput = document.getElementById('localInput');
+    const remoteInput = document.getElementById('remoteInput');
+    const localVideo = document.getElementById('localVideo');
+    const remoteVideo = document.getElementById('remoteVideo');
+    const connectPanel = document.querySelector('.connect-panel');
+    const videoPanel = document.querySelector('.video-panel');
     let peer,
         ws,
         audioStatus = true,
         videoStatus = true;
-    localInput.value = (Math.random() * 1000 * 0x10000).toString(16).slice(0, 4)
-
+    localInput.value = (Math.random() * 1000 * 0x10000).toString(16).slice(0, 4);
 
     const onConnect = () => {
 
-        const option = {}
+        const option = {};
         if (remoteInput.value) {
-            option.initiator = true
+            option.initiator = true;
         }
         peer = new Peer2peer(option);
         peer.addEventListener('localStream', data => {
-            localVideo.srcObject = data.stream
-        })
+            localVideo.srcObject = data.stream;
+        });
 
         peer.addEventListener('offer', offer => {
-            ws.send(JSON.stringify(offer))
-        })
+            ws.send(JSON.stringify(offer));
+        });
         peer.addEventListener('answer', answer => {
-            ws.send(JSON.stringify(answer))
-        })
-        peer.addEventListener('icecandidate', event => {
-            if (event.candidate) ws.send(JSON.stringify({type: 'icecandidate', candidate: event.candidate}))
-        })
-        peer.addEventListener('remoteStream', event => {
-            remoteVideo.srcObject = event.stream
-        })
+            ws.send(JSON.stringify(answer));
+            setTimeout(() => peer.getStats().then(data => console.log(data)), 2000);
 
-        ws = new WebSocket('wss://localhost:8080')
+        });
+        peer.addEventListener('icecandidate', event => {
+            if (event.candidate) ws.send(JSON.stringify({type: 'icecandidate', candidate: event.candidate}));
+        });
+        peer.addEventListener('remoteStream', event => {
+            remoteVideo.srcObject = event.stream;
+        });
+
+        ws = new WebSocket('wss://localhost:8080');
         ws.addEventListener('message', (event) => {
-            const data = JSON.parse(event.data)
+            const data = JSON.parse(event.data);
             switch (data.type) {
                 case 'ready':
-                    connectPanel.style.display = 'none'
+                    connectPanel.style.display = 'none';
                     videoPanel.style.display = 'flex';
                     peer.signal('ready');
-                    break
+                    break;
                 case 'offer':
-                    peer.signal(data)
-                    break
+                    peer.signal(data);
+                    break;
                 case 'answer':
-                    peer.signal(data)
-                    break
+                    peer.signal(data);
+                    break;
                 case 'icecandidate':
-                    peer.signal(data)
-                    break
+                    peer.signal(data);
+                    break;
             }
-        })
-    }
+        });
+    };
 
     const onSwitchAudio = () => {
         const promise = audioStatus ? peer.mute('audio') : peer.unmute('audio');
         promise.then(() => {
             audioStatus = !audioStatus;
-            document.querySelector('.switch-audio').innerHTML = audioStatus ? 'close audio' : 'open audio'
-        })
-    }
+            document.querySelector('.switch-audio').innerHTML = audioStatus ? 'close audio' : 'open audio';
+        });
+    };
 
     const onSwitchVideo = () => {
         const promise = videoStatus ? peer.mute('video') : peer.unmute('video');
         promise.then(() => {
             videoStatus = !videoStatus;
-            document.querySelector('.switch-video').innerHTML = videoStatus ? 'close video' : 'open video'
-        })
-    }
+            document.querySelector('.switch-video').innerHTML = videoStatus ? 'close video' : 'open video';
+        });
+    };
 
     const onleave = () => {
-        peer.leave()
-        location.reload()
+        peer.leave();
+        location.reload();
     };
 </script>
 </body>
