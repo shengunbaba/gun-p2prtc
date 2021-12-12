@@ -16,23 +16,25 @@ export default class Peer2peer extends EventDispatcher {
         this.id = createShortId();
         this._senders = new Map();
 
-        this._pc.oniceconnectionstatechange = (e) => {
-            console.log(e, this._pc.iceConnectionState);
+        this._pc.oniceconnectionstatechange = (event) => {
+            this._oniceconnectionstatechange(event);
         };
-        this._pc.onicegatheringstatechange = (e) => {
-            console.log(e, this._pc.iceConnectionState);
+        this._pc.onicegatheringstatechange = (event) => {
+            this._oniceconnectionstatechange(event);
         };
-        this._pc.onconnectionstatechange = (e) => {
-            console.log(e, this._pc.connectionState);
-        };
-        this._pc.onsignalingstatechange = (e) => console.log(e,
-            this._pc.signalingState);
 
         this._pc.onicecandidate = event => this._onicecandidate(event);
 
         this._pc.ontrack = e => this._onTrack(e);
 
         this._initStreamPromise = this._initStream(opts);
+    }
+
+    _oniceconnectionstatechange(event) {
+        const status = event.currentTarget.iceConnectionState;
+        if (status === 'closed' || status === 'failed') {
+            this._createOffer(true);
+        }
     }
 
     _initStream(opts) {
@@ -188,7 +190,7 @@ export default class Peer2peer extends EventDispatcher {
 
     getStats() {
 
-        return new Promise(resolve => {
+        return new Promise((resolve, reject) => {
             this._pc.getStats().then(stats => {
                 const audioRecv = {},
                     videoRecv = {},
@@ -229,6 +231,8 @@ export default class Peer2peer extends EventDispatcher {
                 });
 
                 resolve({audioRecv, videoRecv, audioSend, videoSend});
+            }, error => {
+                reject(error);
             });
         });
 
