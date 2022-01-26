@@ -1,8 +1,8 @@
 {
   "name": "peer2peertc",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "description": "peer to peer video and audio",
-  "main": "src/index.js",
+  "main": "lib/p2pRTC.min.js",
   "scripts": {
     "watch": "node script/watch.compile.js dev",
     "start": "node script/app.js",

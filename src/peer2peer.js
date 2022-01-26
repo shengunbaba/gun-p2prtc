@@ -28,6 +28,45 @@ export default class Peer2peer extends EventDispatcher {
         this._pc.ontrack = e => this._onTrack(e);
 
         this._initStreamPromise = this._initStream(opts);
+
+        this._createDataChannel();
+    }
+
+    _createDataChannel() {
+        const onopen = () => {
+            console.log(this._dataChannel.readyState);
+            this.dispatchEvent({type: 'dataChannel-ready'});
+        };
+
+        const onclose = () => {
+            console.log(this._dataChannel.readyState);
+            this.dispatchEvent({type: 'dataChannel-close'});
+        };
+
+        if (this.initiator) {
+            this._dataChannel = this._pc.createDataChannel('initiator_channel');
+            this._dataChannel.onopen = onopen;
+            this._dataChannel.onclose = onclose;
+        } else {
+            this._pc.ondatachannel = (event) => {
+                console.log('recevice datachannel');
+                this._dataChannel = event.channel;
+
+                this._dataChannel.onmessage = this._onMessageCallback;
+                this._dataChannel.onopen = onopen;
+                this._dataChannel.onclose = onclose;
+            };
+
+        }
+    }
+
+    _onMessageCallback = (e) => {
+        console.log('Received Message => ', e.data);
+        this.dispatchEvent({type: 'message', data: e.data});
+    };
+
+    send(text) {
+        this._dataChannel.send(text);
     }
 
     _oniceconnectionstatechange(event) {
@@ -243,6 +282,7 @@ export default class Peer2peer extends EventDispatcher {
             track.stop();
         }
         this.localStream = new MediaStream();
+        this._dataChannel.close();
         this._pc.close();
     }
 }

@@ -8,7 +8,7 @@ const server = createServer({
     cert: fs.readFileSync(path.join(__dirname, './secret/server.crt')),
 });
 
-const wss = new WebSocket.WebSocketServer({ server });
+const wss = new WebSocket.WebSocketServer({server});
 
 wss.on('connection', (ws) => {
 
@@ -17,18 +17,19 @@ wss.on('connection', (ws) => {
             data = JSON.stringify(data);
         }
         wss.clients.forEach((client) => {
-            if (client.readyState === WebSocket.OPEN && (!includeSelf && client !== ws || includeSelf)) {
+            if (client.readyState === WebSocket.OPEN &&
+                (!includeSelf && client !== ws || includeSelf)) {
                 client.send(data, {binary: isBinary});
             }
         });
     }
 
     ws.on('message', (data, isBinary) => {
-        broadcast(data.toString(), isBinary, false)
+        broadcast(data.toString(), isBinary, false);
     });
 
     if (wss.clients.size === 2) {
-        broadcast({type: 'ready'}, false, true)
+        broadcast({type: 'ready'}, false, true);
     }
 
     if (wss.clients.size > 2) {

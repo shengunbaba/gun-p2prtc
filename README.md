@@ -63,6 +63,13 @@ A "signaling server" (usually implemented with websockets) would be used to exch
                remoteVideo.srcObject = event.stream
            })
    
+           peer.addEventListener('dataChannel-ready', () => {
+           });
+
+           peer.addEventListener('message', (event) => {
+             receiveMessage.innerText = event.data;
+          });
+
            ws = new WebSocket('wss://localhost:8080')
            ws.addEventListener('message', (event) => {
                const data = JSON.parse(event.data)
@@ -151,6 +158,9 @@ string <video | audio>.  open local audio or open local video, and remote peer w
 ### `peer.getStats()`
 provide statistics about either the overall connection 
 
+### `peer.send(text)`
+send text over datachannel
+
 ### `peer.leave()`
 peer leave.
 
@@ -191,5 +201,17 @@ peer.addEventListener('icecandidate', event => {
 })
 ```
 
+### `dataChannel-ready`
+```js
+peer.addEventListener('dataChannel-ready', () => {
+    // now you can use dataChannel send message
+});
+```
 
+### `message`
+```js
+peer.addEventListener('message', (event) => {
+    console.log('receive text => ', event.data)
+});
+```
 
