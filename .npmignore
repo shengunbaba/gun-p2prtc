@@ -1,7 +1,6 @@
 .git
 .idea
 node_modules
-src
 yarn.lock
 script
 demo

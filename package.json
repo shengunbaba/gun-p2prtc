@@ -1,6 +1,6 @@
 {
   "name": "peer2peertc",
-  "version": "1.0.6",
+  "version": "1.0.7",
   "description": "peer to peer video and audio",
   "main": "lib/p2pRTC.min.js",
   "scripts": {

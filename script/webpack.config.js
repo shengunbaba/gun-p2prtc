@@ -1,8 +1,8 @@
-const webpack = require('webpack')
-const path = require('path')
-const { CleanWebpackPlugin } = require('clean-webpack-plugin')
+const webpack = require('webpack');
+const path = require('path');
+const {CleanWebpackPlugin} = require('clean-webpack-plugin');
 
-const isDev = process.argv[2]==='dev'
+const isDev = process.argv[2] === 'dev';
 
 module.exports = {
 
@@ -12,9 +12,10 @@ module.exports = {
 
     output: {
         path: path.join(__dirname, '../lib'),
-        filename: isDev ? 'p2pRTC.js':'p2pRTC.min.js',
+        filename: isDev ? 'p2pRTC.js' : 'p2pRTC.min.js',
+        libraryTarget: 'umd',
     },
-    mode: isDev ? 'development':'production',
+    mode: isDev ? 'development' : 'production',
 
     module: {
         rules: [
@@ -56,8 +57,8 @@ module.exports = {
         new webpack.ProgressPlugin(),
         new CleanWebpackPlugin(),
         new webpack.DefinePlugin({
-            'process.env': { NODE_ENV: '"development"' },
+            'process.env': {NODE_ENV: '"development"'},
         }),
     ],
-}
+};
 
