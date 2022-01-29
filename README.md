@@ -15,6 +15,10 @@ The peer2peerRTC is separated from websocket; you can customize your signaling s
 you can install with npm ,or use script tags to import
 ```jsx 
 npm install peer2peertc
+
+or 
+
+<script src="./p2pRTC.min.js"></script>
 ```
 
 This example create two peers in separated web page.  
@@ -29,7 +33,7 @@ A "signaling server" (usually implemented with websockets) would be used to exch
 <head>
     <meta charset="UTF-8">
     <title>Peer2Peer</title>
-    <script src="./p2pRTC.js"></script>
+    <script src="./p2pRTC.min.js"></script>
 </head>
 <body>
 <div class="video-wrap">
