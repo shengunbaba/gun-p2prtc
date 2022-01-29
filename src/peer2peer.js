@@ -287,4 +287,3 @@ export default class Peer2peer extends EventDispatcher {
     }
 }
 
-window && (window.Peer2peer = Peer2peer);

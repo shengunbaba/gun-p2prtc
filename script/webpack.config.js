@@ -13,7 +13,6 @@ module.exports = {
     output: {
         path: path.join(__dirname, '../lib'),
         filename: isDev ? 'p2pRTC.js' : 'p2pRTC.min.js',
-        libraryTarget: 'umd',
     },
     mode: isDev ? 'development' : 'production',
 
