@@ -2,11 +2,9 @@
   "name": "peer2peertc",
   "version": "1.0.8",
   "description": "peer to peer video and audio",
-  "main": "lib/p2pRTC.min.js",
+  "main": "src/index.js",
   "scripts": {
-    "watch": "node script/watch.compile.js dev",
-    "start": "node script/app.js",
-    "build": "node_modules/.bin/webpack --config script/webpack.config.js"
+    "start": "node app.js"
   },
   "author": "",
   "license": "ISC",
@@ -17,7 +15,9 @@
     "audio"
   ],
   "devDependencies": {
-    "gun-pack": "^1.0.11",
     "ws": "^8.3.0"
+  },
+  "dependencies": {
+    "express": "^4.17.3"
   }
 }

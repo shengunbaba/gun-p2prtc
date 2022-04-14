@@ -1,4 +1,4 @@
-import {EventDispatcher, createShortId} from './utils';
+import {EventDispatcher, createShortId} from './utils.js';
 
 export default class Peer2peer extends EventDispatcher {
     constructor(opts) {
@@ -287,4 +287,4 @@ export default class Peer2peer extends EventDispatcher {
     }
 }
 
-window && (window.Peer2peer = Peer2peer);
+window.Peer2peer = Peer2peer;

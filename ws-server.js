@@ -1,17 +1,8 @@
 const WebSocket = require('ws');
-const {createServer} = require('https');
-const fs = require('fs');
-const path = require('path');
 
-const server = createServer({
-    key: fs.readFileSync(path.join(__dirname, './secret/server.key')),
-    cert: fs.readFileSync(path.join(__dirname, './secret/server.crt')),
-});
-
-const wss = new WebSocket.WebSocketServer({server});
+const wss = new WebSocket.WebSocketServer({port: 8080});
 
 wss.on('connection', (ws) => {
-
     function broadcast(data, isBinary, includeSelf) {
         if (typeof data === 'object' && !isBinary) {
             data = JSON.stringify(data);
@@ -38,4 +29,3 @@ wss.on('connection', (ws) => {
 
 });
 
-server.listen(8080);
