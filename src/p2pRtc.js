@@ -1,8 +1,8 @@
 import {EventDispatcher, createShortId} from './utils.js';
 
-export default class Peer2peer extends EventDispatcher {
+export default class P2pRtc extends EventDispatcher {
     constructor(opts) {
-        super(opts);
+        super();
         this.rtcConfiguration = opts.rtcConfiguration || null;
         this.initiator = opts.initiator || false;
         this.offerOptions = opts.offerOptions ||
@@ -34,12 +34,10 @@ export default class Peer2peer extends EventDispatcher {
 
     _createDataChannel() {
         const onopen = () => {
-            console.log(this._dataChannel.readyState);
             this.dispatchEvent({type: 'dataChannel-ready'});
         };
 
         const onclose = () => {
-            console.log(this._dataChannel.readyState);
             this.dispatchEvent({type: 'dataChannel-close'});
         };
 
@@ -47,9 +45,10 @@ export default class Peer2peer extends EventDispatcher {
             this._dataChannel = this._pc.createDataChannel('initiator_channel');
             this._dataChannel.onopen = onopen;
             this._dataChannel.onclose = onclose;
+            this._dataChannel.onmessage = this._onMessageCallback;
         } else {
             this._pc.ondatachannel = (event) => {
-                console.log('recevice datachannel');
+                console.log('receviced datachannel');
                 this._dataChannel = event.channel;
 
                 this._dataChannel.onmessage = this._onMessageCallback;
@@ -61,7 +60,6 @@ export default class Peer2peer extends EventDispatcher {
     }
 
     _onMessageCallback = (e) => {
-        console.log('Received Message => ', e.data);
         this.dispatchEvent({type: 'message', data: e.data});
     };
 
@@ -287,4 +285,4 @@ export default class Peer2peer extends EventDispatcher {
     }
 }
 
-window.Peer2peer = Peer2peer;
+window.P2pRtc = P2pRtc;

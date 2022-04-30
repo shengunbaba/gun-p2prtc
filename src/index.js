@@ -1,5 +1,4 @@
-import Peer2peer from './peer2peer.js'
+import P2pRtc from './p2pRtc.js'
 
-export default Peer2peer;
+export default P2pRtc;
 
-window.Peer2peer = Peer2peer

@@ -1,30 +1,29 @@
 const WebSocket = require('ws');
 
-const wss = new WebSocket.WebSocketServer({port: 8080});
+const server = new WebSocket.WebSocketServer({port: 8080});
 
-wss.on('connection', (ws) => {
+server.on('connection', (client) => {
     function broadcast(data, isBinary, includeSelf) {
         if (typeof data === 'object' && !isBinary) {
             data = JSON.stringify(data);
         }
-        wss.clients.forEach((client) => {
-            if (client.readyState === WebSocket.OPEN &&
-                (!includeSelf && client !== ws || includeSelf)) {
-                client.send(data, {binary: isBinary});
+        server.clients.forEach((_client) => {
+            if (_client.readyState === WebSocket.OPEN && (!includeSelf && _client !== client || includeSelf)) {
+                _client.send(data, {binary: isBinary});
             }
         });
     }
 
-    ws.on('message', (data, isBinary) => {
+    client.on('message', (data, isBinary) => {
         broadcast(data.toString(), isBinary, false);
     });
 
-    if (wss.clients.size === 2) {
+    if (server.clients.size === 2) {
         broadcast({type: 'ready'}, false, true);
     }
 
-    if (wss.clients.size > 2) {
-        ws.close();
+    if (server.clients.size > 2) {
+        client.close();
     }
 
 });

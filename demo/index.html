@@ -2,141 +2,149 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Peer2Peer</title>
+    <title>gun-p2prtc</title>
     <link rel="stylesheet" href="./style.css">
-    <script src="./index.js" type="module"></script>
 </head>
 <body>
-<ul class="connect-panel">
+<ul id="connectPanel">
     <li>
-        <label for="localInput">local:</label>
-        <input type="text" id="localInput">
+        <label for="initiator">initiator:</label>
+        <input type="checkbox" id="initiator">
     </li>
-    <li>
-        <label for="remoteInput">remote:</label>
-        <input type="text" id="remoteInput">
-    </li>
-    <li class="connect" onclick="onConnect()">connect</li>
+    <li id="connectBtn">connect</li>
 </ul>
-<div class="message-wrap">
-    <div class="send">
-        <button id="sendBtn">send</button>
-        <textarea name="" id="sendText" cols="30" rows="5" placeholder="send message..."></textarea>
+
+
+<div id="inRoomPanel">
+    <div class="video-wrap">
+        <video id="localVideo" autoplay muted></video>
+        <video id="remoteVideo" autoplay></video>
     </div>
-    <div id="receiveMessage">receive message...</div>
+    <div class="operate-wrap">
+        <div class="message-wrap">
+            <div class="send">
+                <button id="sendBtn">send</button>
+                <textarea name="" id="sendText" cols="30" rows="5" placeholder="send message..."></textarea>
+            </div>
+            <div id="receiveMessage">receive message...</div>
+        </div>
+        <button id="getStats">getStats</button>
+        <button id="switchAudio">close audio</button>
+        <button id="switchVideo">close video</button>
+        <button id="leave">leave</button>
+    </div>
 </div>
-<div class="video-panel">
-    <span onclick="onSwitchAudio()" class="switch-audio">close audio</span>
-    <span onclick="onSwitchVideo()" class="switch-video">close video</span>
-    <span onclick="onleave()">leave</span>
-</div>
-<div class="video-wrap">
-    <video id="localVideo" autoplay muted></video>
-    <video id="remoteVideo" autoplay></video>
-</div>
 
 
-<script>
-    const localInput = document.getElementById('localInput');
-    const remoteInput = document.getElementById('remoteInput');
-    const localVideo = document.getElementById('localVideo');
-    const remoteVideo = document.getElementById('remoteVideo');
-    const connectPanel = document.querySelector('.connect-panel');
-    const videoPanel = document.querySelector('.video-panel');
+<script type="module">
+    import P2pRtc from '/index.js';
 
-    const receiveMessage = document.getElementById('receiveMessage');
-    const sendText = document.getElementById('sendText');
-    const sendBtn = document.getElementById('sendBtn');
+    const $ = (str) => document.getElementById(str);
 
-    let peer,
-        ws,
-        dataChannelStatus,
-        audioStatus = true,
-        videoStatus = true;
-    localInput.value = (Math.random() * 1000 * 0x10000).toString(16).slice(0, 4);
+    let peer, ws, audioStatus = true, videoStatus = true;
 
-    const onConnect = () => {
+    function createWs() {
         ws = new WebSocket('ws://localhost:8080');
-
-        const option = {};
-        if (remoteInput.value) {
-            option.initiator = true;
-        }
-        peer = new Peer2peer(option);
-        peer.addEventListener('localStream', data => {
-            localVideo.srcObject = data.stream;
-        });
-
-        peer.addEventListener('offer', offer => {
-            ws.send(JSON.stringify(offer));
-        });
-        peer.addEventListener('answer', answer => {
-            ws.send(JSON.stringify(answer));
-            setTimeout(() => peer.getStats().then(data => console.log(data)), 2000);
-
-        });
-        peer.addEventListener('icecandidate', event => {
-            if (event.candidate) ws.send(JSON.stringify({type: 'icecandidate', candidate: event.candidate}));
-        });
-        peer.addEventListener('remoteStream', event => {
-            remoteVideo.srcObject = event.stream;
-        });
-
-        peer.addEventListener('dataChannel-ready', () => {
-            dataChannelStatus = true;
-        });
-
-        peer.addEventListener('message', (event) => {
-            receiveMessage.innerText = event.data;
-        });
-
         ws.addEventListener('message', (event) => {
             const data = JSON.parse(event.data);
             switch (data.type) {
                 case 'ready':
-                    connectPanel.style.display = 'none';
-                    videoPanel.style.display = 'flex';
+                    console.log('ws => ready');
+                    initPeer();
                     peer.signal('ready');
                     break;
                 case 'offer':
+                    console.log('ws => remote offer');
                     peer.signal(data);
                     break;
                 case 'answer':
+                    console.log('ws => remote answer');
                     peer.signal(data);
                     break;
                 case 'icecandidate':
+                    console.log('ws => remote icecandidate');
                     peer.signal(data);
                     break;
             }
         });
+    }
+
+    function initPeer() {
+        const option = {};
+
+        if ($('initiator').checked) {
+            option.initiator = true;
+        }
+
+        peer = new P2pRtc(option);
+        peer.addEventListener('localStream', data => {
+            console.log('peer localStream => ', data);
+            $('localVideo').srcObject = data.stream;
+        });
+
+        peer.addEventListener('offer', offer => {
+            console.log('peer => local offer');
+            ws.send(JSON.stringify(offer));
+        });
+
+        peer.addEventListener('answer', answer => {
+            console.log('peer => local answer');
+            ws.send(JSON.stringify(answer));
+        });
+        peer.addEventListener('icecandidate', event => {
+            console.log('peer => local icecandidate');
+            if (event.candidate) ws.send(JSON.stringify({type: 'icecandidate', candidate: event.candidate}));
+        });
+        peer.addEventListener('remoteStream', event => {
+            console.log('peer remoteStream => ', event);
+            $('remoteVideo').srcObject = event.stream;
+        });
+
+        peer.addEventListener('dataChannel-ready', () => {
+            console.log('dataChannel-ready => success');
+        });
+
+        peer.addEventListener('message', (event) => {
+            console.log('dataChannel remote message =>', event);
+            $('receiveMessage').innerText = event.data;
+        });
+    }
+
+    $('connectBtn').onclick = () => {
+        $('connectPanel').style.display = 'none';
+        $('inRoomPanel').style.display = 'flex';
+        createWs();
     };
 
-    const onSwitchAudio = () => {
+    $('switchAudio').onclick = () => {
         const promise = audioStatus ? peer.mute('audio') : peer.unmute('audio');
         promise.then(() => {
             audioStatus = !audioStatus;
-            document.querySelector('.switch-audio').innerHTML = audioStatus ? 'close audio' : 'open audio';
+            $('switchAudio').innerHTML = audioStatus ? 'close audio' : 'open audio';
         });
     };
 
-    const onSwitchVideo = () => {
+    $('switchVideo').onclick = () => {
         const promise = videoStatus ? peer.mute('video') : peer.unmute('video');
         promise.then(() => {
             videoStatus = !videoStatus;
-            document.querySelector('.switch-video').innerHTML = videoStatus ? 'close video' : 'open video';
+            $('switchVideo').innerHTML = videoStatus ? 'close video' : 'open video';
         });
     };
 
-    sendBtn.addEventListener('click', () => {
-        if (dataChannelStatus) {
-            peer.send(sendText.value);
-        }
-    });
-
-    const onleave = () => {
+    $('leave').onclick = () => {
         peer.leave();
+        alert('leaved');
         location.reload();
     };
+
+    $('sendBtn').onclick = () => {
+        peer.send($('sendText').value);
+    };
+
+    $('getStats').onclick = () => {
+        setInterval(() => peer.getStats().then(data => console.log('getStats =>', data)), 1000);
+    }
 </script>
 </body>
 </html>
